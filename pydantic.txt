@@ -1,0 +1,43 @@
+pydantic is a Python library for data parsing and validation. It uses the type hinting mechanism of the newer versions of Python (version 3.6 onwards) and validates the types during the runtime. Pydantic defines BaseModel class. It acts as the base class for creating user defined models.
+
+Following code defines a Student class as a model based on BaseModel.
+
+from typing import List
+from pydantic import BaseModel
+class Student(BaseModel):
+   id: int
+   name :str
+   subjects: List[str] = []
+The attributes of the Student class are declared with type hints. Note that the subjects attribute is of List type defined in typing module and of builtin list type.
+
+We can populate an object of Student class with a dictionary with matching structure as follows −
+
+>>> data = {
+   'id': 1,
+   'name': 'Ravikumar',
+   'subjects': ["Eng", "Maths", "Sci"],
+}
+>>> s1=Student(**data)
+>>> print (s1)
+id=1 name='Ravikumar' subjects=['Eng', 'Maths', 'Sci']
+>>> s1
+Student(id=1, name='Ravikumar', subjects=['Eng', 'Maths', 'Sci'])
+>>> s1.dict()
+{'id': 1, 'name': 'Ravikumar', 'subjects': ['Eng', 'Maths', 'Sci']}
+Pydantic will automatically get the data types converted whenever possible. For example, even if the id key in the dictionary is assigned a string representation of a number (such as '123'), it will coerce it into an integer. But whenever not possible, an exception will be raised.
+
+>>> data = {
+   'id': [1,2],
+   'name': 'Ravikumar',
+   'subjects': ["Eng", "Maths", "Sci"],
+}
+>>> s1=Student(**data)
+Traceback (most recent call last):
+   File "<pyshell#13>", line 1, in <module>
+      s1=Student(**data)
+   File "pydantic\main.py", line 406, in
+pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 1 validation error
+for Student
+id
+   value is not a valid integer (type=type_error.integer)
