@@ -6,3 +6,71 @@ The x: int part means that the function expects an int object to be passed to th
 A tool like mypy or pyright can now check that you're not doing something shady, like here:
 def double(x: int) -> int:
     return x + "FizzBuzz"  # error!
+    
+    
+Typing module
+
+The typing module
+The typing module provides some more sophisticated type hints.
+
+Any
+Sometimes you don't want to specify a type:
+
+You can't express it in the Python's type hint system;
+It would be verbose and confusing, requiring lots of extra code;
+You really don't care what the type is — consider the print function.
+Any denotes the "wildcard type". It can be treated as any type, and any value can be treated as Any.
+from typing import Any
+
+def print_twice(something: Any) -> None:
+    print(something, something, "!")
+(note: you may not have to write the -> None here — Pyright [and mypy if you set the appropriate option] will infer it for you)
+
+Don't overuse Any, though — there are often better ways.
+
+Union
+Sometimes you accept several types, not just one!
+#          str OR int --V
+def print_thing(thing: ???) -> None:
+    if isinstance(thing, str):
+        print("string", thing)
+    else:
+        print("number", thing)
+In that case, you can use typing.Union.
+from typing import Union
+
+def print_thing(thing: Union[str, int]) -> None:
+    if isinstance(thing, str):
+        print("string", thing)
+    else:
+        print("number", thing)
+Unions are very powerful. Type checkers can do what's called type narrowing: an if or a while condition can restrict the type. For example, type checkers understand isinstance checks:
+alt text
+It means that you can do this:
+def print_thing(thing: Union[str, int]) -> None:
+    if isinstance(thing, str):
+        print("string", thing + "!")
+    else:
+        print("number", thing + 10)
+and the type checker will understand that in the first if clause thing has type str, and in the second clause it has type int.
+
+Here we've seen that some types can be parametrized — you can pass arguments to a type to configure it. It's not special syntax — it's just using subscription, like you do on lists and dictionaries.
+
+Optional
+Optional[YourType] is just a shorthand for Union[YourType, None]. Union with None is very commonly used to indicate a potentially missing result. For example, when you call .get(some_key) on a dictionary, you get either an item or None.
+
+Let's typehint this function that implements translation from Russian to English, but caches the results. It will encode an unknown word as None.
+from typing import Optional
+
+_cache = {"питон": "python"}
+
+def translate(word: str) -> Optional[str]:
+    from_cache = _cache.get(word)
+    if from_cache is not None:
+        return from_cache
+    fetched = fetch_translation(word, "ru", "en")
+    if fetched is None:
+        return None
+    _cache[word] = fetched
+    return fetched
+Try to assign a type to every
