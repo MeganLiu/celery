@@ -1,0 +1,8 @@
+Python allows you to document types with type hints. They look like this:
+def double(x: int) -> int:
+    return x + x
+The x: int part means that the function expects an int object to be passed to the function; and the -> int means that the function will return an int object.
+
+A tool like mypy or pyright can now check that you're not doing something shady, like here:
+def double(x: int) -> int:
+    return x + "FizzBuzz"  # error!
